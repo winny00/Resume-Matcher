@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 import Pencil from 'lucide-react/dist/esm/icons/pencil';
+import Plus from 'lucide-react/dist/esm/icons/plus';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +19,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from '@/lib/i18n';
-import { getApplicationDetail, updateApplication, type ApplicationDetail } from '@/lib/api/tracker';
+import {
+  getApplicationDetail,
+  updateApplication,
+  type ApplicationDetail,
+  type InterviewQuestion,
+} from '@/lib/api/tracker';
 
 interface CardDetailModalProps {
   applicationId: string | null;
@@ -47,6 +54,9 @@ export function CardDetailModal({
   const [notes, setNotes] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
   const [notesError, setNotesError] = useState<string | null>(null);
+  const [questionDraft, setQuestionDraft] = useState('');
+  const [savingQuestions, setSavingQuestions] = useState(false);
+  const [questionsError, setQuestionsError] = useState<string | null>(null);
   const [interviewAt, setInterviewAt] = useState('');
   const [savingInterviewAt, setSavingInterviewAt] = useState(false);
   const [interviewAtError, setInterviewAtError] = useState<string | null>(null);
@@ -65,6 +75,8 @@ export function CardDetailModal({
         setNotes(data.notes ?? '');
         setInterviewAt(toDateTimeLocalValue(data.interview_at));
         setNotesError(null);
+        setQuestionDraft('');
+        setQuestionsError(null);
         setInterviewAtError(null);
       })
       .catch(() => {
@@ -81,6 +93,49 @@ export function CardDetailModal({
   // Keep textarea Enter from bubbling to dialog/global handlers.
   const handleNotesKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') e.stopPropagation();
+  };
+
+  const saveQuestions = async (nextQuestions: InterviewQuestion[]) => {
+    if (!applicationId || !detail) return;
+    setSavingQuestions(true);
+    setQuestionsError(null);
+    try {
+      const updated = await updateApplication(applicationId, {
+        interview_questions: nextQuestions,
+      });
+      setDetail({ ...detail, ...updated, interview_questions: updated.interview_questions ?? [] });
+      onUpdated();
+    } catch {
+      setQuestionsError(t('common.error'));
+    } finally {
+      setSavingQuestions(false);
+    }
+  };
+
+  const handleAddQuestion = async () => {
+    const question = questionDraft.trim();
+    if (!question || !detail) return;
+    const now = new Date().toISOString();
+    await saveQuestions([
+      ...(detail.interview_questions ?? []),
+      {
+        id:
+          typeof crypto !== 'undefined' && 'randomUUID' in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}`,
+        question,
+        created_at: now,
+        updated_at: now,
+      },
+    ]);
+    setQuestionDraft('');
+  };
+
+  const handleDeleteQuestion = async (questionId: string) => {
+    if (!detail) return;
+    await saveQuestions(
+      (detail.interview_questions ?? []).filter((item) => item.id !== questionId)
+    );
   };
 
   const handleSaveNotes = async () => {
@@ -165,9 +220,7 @@ export function CardDetailModal({
                 />
                 <div className="flex items-center justify-end gap-3">
                   {interviewAtError && (
-                    <span className="font-mono text-xs text-destructive">
-                      {interviewAtError}
-                    </span>
+                    <span className="font-mono text-xs text-destructive">{interviewAtError}</span>
                   )}
                   <Button
                     size="sm"
@@ -212,6 +265,66 @@ export function CardDetailModal({
                   )}
                 </Button>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="card-interview-question">
+                {t('tracker.interviewQuestions.sectionTitle')}
+              </Label>
+              <div className="flex gap-2">
+                <Textarea
+                  id="card-interview-question"
+                  value={questionDraft}
+                  onChange={(e) => setQuestionDraft(e.target.value)}
+                  onKeyDown={handleNotesKeyDown}
+                  placeholder={t('tracker.interviewQuestions.questionPlaceholder')}
+                  rows={2}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleAddQuestion}
+                  disabled={savingQuestions || !questionDraft.trim()}
+                  aria-label={t('tracker.interviewQuestions.add')}
+                  className="h-auto self-stretch"
+                >
+                  {savingQuestions ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              {(detail.interview_questions ?? []).length > 0 ? (
+                <div className="max-h-40 space-y-2 overflow-y-auto">
+                  {(detail.interview_questions ?? []).map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex gap-2 border border-black bg-paper-tint p-2 text-sm"
+                    >
+                      <p className="min-w-0 flex-1 whitespace-pre-wrap text-ink">{item.question}</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteQuestion(item.id)}
+                        disabled={savingQuestions}
+                        aria-label={t('tracker.interviewQuestions.delete')}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="font-mono text-xs text-steel-grey">
+                  {t('tracker.interviewQuestions.emptyForApplication')}
+                </p>
+              )}
+              {questionsError && (
+                <p className="font-mono text-xs text-destructive">{questionsError}</p>
+              )}
             </div>
 
             {!resumeAvailable && (

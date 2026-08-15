@@ -73,7 +73,8 @@ def init_models_sync(engine: Engine) -> None:
         application_columns = (
             conn.exec_driver_sql("PRAGMA table_info(applications)").mappings().all()
         )
-        if application_columns and "interview_at" not in {
-            column["name"] for column in application_columns
-        }:
+        application_column_names = {column["name"] for column in application_columns}
+        if application_columns and "interview_at" not in application_column_names:
             conn.exec_driver_sql("ALTER TABLE applications ADD COLUMN interview_at TEXT")
+        if application_columns and "interview_questions" not in application_column_names:
+            conn.exec_driver_sql("ALTER TABLE applications ADD COLUMN interview_questions JSON")

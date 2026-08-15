@@ -1045,6 +1045,18 @@
       "validation": "이력서를 선택하고 채용 공고를 붙여넣으세요.",
       "failed": "지원 항목을 생성할 수 없습니다."
     },
+    "interviewQuestions": {
+      "button": "면접 질문",
+      "title": "면접 질문",
+      "description": "지원 항목별로 기록한 모든 면접 질문을 확인하세요.",
+      "sectionTitle": "면접 질문",
+      "questionPlaceholder": "이번 면접에서 나온 질문을 추가하세요…",
+      "add": "면접 질문 추가",
+      "delete": "면접 질문 삭제",
+      "emptyForApplication": "이 지원 항목에는 기록된 면접 질문이 없습니다.",
+      "emptyTitle": "아직 면접 질문이 없습니다",
+      "emptyDescription": "지원 카드를 열고 준비 또는 회고 중에 질문을 추가하세요."
+    },
     "errors": {
       "loadFailed": "지원 내역을 불러올 수 없습니다.",
       "moveFailed": "지원 항목을 이동할 수 없습니다.",

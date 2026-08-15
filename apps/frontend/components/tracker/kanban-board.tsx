@@ -13,6 +13,7 @@ import {
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import Plus from 'lucide-react/dist/esm/icons/plus';
 import SlidersHorizontal from 'lucide-react/dist/esm/icons/sliders-horizontal';
+import MessageSquareText from 'lucide-react/dist/esm/icons/message-square-text';
 import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
@@ -31,6 +32,7 @@ import {
 import { KanbanColumn } from './kanban-column';
 import { BulkActionBar } from './bulk-action-bar';
 import { CardDetailModal } from './card-detail-modal';
+import { InterviewQuestionsDialog } from './interview-questions-dialog';
 import { ManualAddApplicationDialog } from './manual-add-application-dialog';
 import { StatusVisibilityDialog } from './status-visibility-dialog';
 import { planMove } from './reorder';
@@ -57,6 +59,7 @@ export function KanbanBoard() {
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [manualAddOpen, setManualAddOpen] = useState(false);
   const [statusManagerOpen, setStatusManagerOpen] = useState(false);
+  const [interviewQuestionsOpen, setInterviewQuestionsOpen] = useState(false);
   const [visibleStatuses, setVisibleStatuses] =
     useState<ApplicationStatus[]>(APPLICATION_STATUS_ORDER);
 
@@ -249,6 +252,10 @@ export function KanbanBoard() {
             <SlidersHorizontal className="h-4 w-4" />
             {t('tracker.manage.button')}
           </Button>
+          <Button variant="outline" onClick={() => setInterviewQuestionsOpen(true)}>
+            <MessageSquareText className="h-4 w-4" />
+            {t('tracker.interviewQuestions.button')}
+          </Button>
           <Button onClick={() => setManualAddOpen(true)}>
             <Plus className="h-4 w-4" />
             {t('tracker.addApplication')}
@@ -355,6 +362,12 @@ export function KanbanBoard() {
         onOpenChange={setStatusManagerOpen}
         visibleStatuses={visibleStatuses}
         onVisibleStatusesChange={handleVisibleStatusesChange}
+      />
+
+      <InterviewQuestionsDialog
+        open={interviewQuestionsOpen}
+        onOpenChange={setInterviewQuestionsOpen}
+        applications={allCards}
       />
 
       <ManualAddApplicationDialog

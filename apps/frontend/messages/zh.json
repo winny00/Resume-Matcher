@@ -1045,6 +1045,18 @@
       "validation": "请选择一份简历并粘贴职位描述。",
       "failed": "无法创建该申请。"
     },
+    "interviewQuestions": {
+      "button": "面试题",
+      "title": "面试题",
+      "description": "统一查看所有申请中记录过的面试题。",
+      "sectionTitle": "面试题",
+      "questionPlaceholder": "添加这次面试中的问题……",
+      "add": "添加面试题",
+      "delete": "删除面试题",
+      "emptyForApplication": "此申请还没有记录面试题。",
+      "emptyTitle": "暂无面试题",
+      "emptyDescription": "打开某张申请卡片，即可在准备或复盘时记录面试题。"
+    },
     "errors": {
       "loadFailed": "无法加载申请。",
       "moveFailed": "无法移动该申请。",

@@ -1045,6 +1045,18 @@
       "validation": "履歴書を選び、求人内容を貼り付けてください。",
       "failed": "応募を作成できませんでした。"
     },
+    "interviewQuestions": {
+      "button": "面接質問",
+      "title": "面接質問",
+      "description": "応募ごとに記録した面接質問をまとめて確認します。",
+      "sectionTitle": "面接質問",
+      "questionPlaceholder": "この面接で出た質問を追加…",
+      "add": "面接質問を追加",
+      "delete": "面接質問を削除",
+      "emptyForApplication": "この応募には面接質問が記録されていません。",
+      "emptyTitle": "面接質問はまだありません",
+      "emptyDescription": "応募カードを開き、準備や振り返りの際に質問を追加できます。"
+    },
     "errors": {
       "loadFailed": "応募を読み込めませんでした。",
       "moveFailed": "応募を移動できませんでした。",
