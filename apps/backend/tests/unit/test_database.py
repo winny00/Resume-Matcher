@@ -238,6 +238,15 @@ class TestApplications:
         assert [x["application_id"] for x in applied] == [b["application_id"]]
         assert applied[0]["position"] == 0
 
+    async def test_interview_time_round_trips(self, db):
+        card = await db.create_application(job_id="j1", resume_id="r1", status="interview")
+        updated = await db.update_application(
+            card["application_id"], {"interview_at": "2026-08-20T14:30"}
+        )
+        assert updated["interview_at"] == "2026-08-20T14:30"
+        found = await db.get_application(card["application_id"])
+        assert found["interview_at"] == "2026-08-20T14:30"
+
     async def test_bulk_update_and_delete(self, db):
         a = await db.create_application(job_id="j1", resume_id="r1")
         b = await db.create_application(job_id="j2", resume_id="r2")
