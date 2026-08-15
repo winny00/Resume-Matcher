@@ -14,6 +14,13 @@ export const APPLICATION_STATUS_ORDER: ApplicationStatus[] = [
   'rejected',
 ];
 
+export interface InterviewQuestion {
+  id: string;
+  question: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Application {
   application_id: string;
   job_id: string;
@@ -24,6 +31,7 @@ export interface Application {
   role: string | null;
   applied_at: string | null;
   notes: string | null;
+  interview_questions: InterviewQuestion[];
   position: number;
   created_at: string;
   updated_at: string;
@@ -57,6 +65,7 @@ export interface ApplicationUpdate {
   company?: string;
   role?: string;
   applied_at?: string;
+  interview_questions?: InterviewQuestion[];
 }
 
 export interface ApplicationActionResponse {

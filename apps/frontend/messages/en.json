@@ -1042,6 +1042,18 @@
       "validation": "Pick a resume and paste a job description.",
       "failed": "Could not create the application."
     },
+    "interviewQuestions": {
+      "button": "Interview Questions",
+      "title": "Interview Questions",
+      "description": "Review every question you have recorded across applications.",
+      "sectionTitle": "Interview Questions",
+      "questionPlaceholder": "Add a question from this interview…",
+      "add": "Add interview question",
+      "delete": "Delete interview question",
+      "emptyForApplication": "No interview questions recorded for this application.",
+      "emptyTitle": "No interview questions yet",
+      "emptyDescription": "Open an application card and add questions as you prepare or debrief."
+    },
     "errors": {
       "loadFailed": "Could not load applications.",
       "moveFailed": "Could not move the application.",

@@ -66,6 +66,35 @@ describe('tracker API client', () => {
     expect(JSON.parse(String(options.body))).toEqual({ status: 'rejected', position: 0 });
   });
 
+  it('updateApplication PATCHes interview questions', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ application_id: 'x' }), { status: 200 })
+    );
+    await updateApplication('x', {
+      interview_questions: [
+        {
+          id: 'q1',
+          question: 'Tell me about a project.',
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-01T00:00:00Z',
+        },
+      ],
+    });
+    const { url, options } = lastCall();
+    expect(url).toContain('/applications/x');
+    expect(options.method).toBe('PATCH');
+    expect(JSON.parse(String(options.body))).toEqual({
+      interview_questions: [
+        {
+          id: 'q1',
+          question: 'Tell me about a project.',
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-01T00:00:00Z',
+        },
+      ],
+    });
+  });
+
   it('createApplication POSTs the manual-add payload', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ application_id: 'x' }), { status: 200 })

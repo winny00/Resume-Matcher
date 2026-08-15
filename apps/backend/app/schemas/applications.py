@@ -22,6 +22,15 @@ class ApplicationStatus(str, Enum):
 APPLICATION_STATUS_ORDER: list[str] = [s.value for s in ApplicationStatus]
 
 
+class InterviewQuestion(BaseModel):
+    """A manually recorded interview question for one application."""
+
+    id: str = Field(min_length=1)
+    question: str = Field(min_length=1, max_length=2000)
+    created_at: str
+    updated_at: str
+
+
 class ApplicationResponse(BaseModel):
     """A single tracker card."""
 
@@ -34,6 +43,7 @@ class ApplicationResponse(BaseModel):
     role: str | None = None
     applied_at: str | None = None
     notes: str | None = None
+    interview_questions: list[InterviewQuestion] = Field(default_factory=list)
     position: int
     created_at: str
     updated_at: str
@@ -81,6 +91,7 @@ class ApplicationUpdate(BaseModel):
     company: str | None = None
     role: str | None = None
     applied_at: str | None = None
+    interview_questions: list[InterviewQuestion] | None = None
 
 
 class BulkStatusUpdate(BaseModel):

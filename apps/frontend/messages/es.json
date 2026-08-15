@@ -1042,6 +1042,18 @@
       "validation": "Elige un currículum y pega una descripción del empleo.",
       "failed": "No se pudo crear la candidatura."
     },
+    "interviewQuestions": {
+      "button": "Preguntas de entrevista",
+      "title": "Preguntas de entrevista",
+      "description": "Revisa todas las preguntas registradas en tus candidaturas.",
+      "sectionTitle": "Preguntas de entrevista",
+      "questionPlaceholder": "Añade una pregunta de esta entrevista…",
+      "add": "Añadir pregunta de entrevista",
+      "delete": "Eliminar pregunta de entrevista",
+      "emptyForApplication": "No hay preguntas registradas para esta candidatura.",
+      "emptyTitle": "Aún no hay preguntas de entrevista",
+      "emptyDescription": "Abre una tarjeta de candidatura y añade preguntas al preparar o repasar."
+    },
     "errors": {
       "loadFailed": "No se pudieron cargar las candidaturas.",
       "moveFailed": "No se pudo mover la candidatura.",

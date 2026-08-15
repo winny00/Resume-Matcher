@@ -141,6 +141,48 @@ class TestUpdateAndMove:
         assert body["notes"] == "Recruiter call Friday"
         assert body["company"] == "NewCo"
 
+    async def test_patch_interview_questions(self, isolated_db):
+        card = await _seed_card(isolated_db, company="Acme Corp", role="Staff Engineer")
+        questions = [
+            {
+                "id": "q1",
+                "question": "Tell me about a complex project.",
+                "created_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-01-01T00:00:00Z",
+            }
+        ]
+        async with _client() as client:
+            resp = await client.patch(
+                f"/api/v1/applications/{card['application_id']}",
+                json={"interview_questions": questions},
+            )
+        assert resp.status_code == 200
+        assert resp.json()["interview_questions"] == questions
+
+        async with _client() as client:
+            detail = await client.get(f"/api/v1/applications/{card['application_id']}")
+        assert detail.json()["company"] == "Acme Corp"
+        assert detail.json()["interview_questions"][0]["question"] == questions[0]["question"]
+
+    async def test_move_preserves_interview_questions(self, isolated_db):
+        questions = [
+            {
+                "id": "q1",
+                "question": "How would you design the tracker?",
+                "created_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-01-01T00:00:00Z",
+            }
+        ]
+        card = await _seed_card(isolated_db, interview_questions=questions)
+        async with _client() as client:
+            resp = await client.patch(
+                f"/api/v1/applications/{card['application_id']}",
+                json={"status": "interview", "position": 0},
+            )
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "interview"
+        assert resp.json()["interview_questions"] == questions
+
     async def test_patch_unknown_returns_404(self, isolated_db):
         async with _client() as client:
             resp = await client.patch("/api/v1/applications/nope", json={"notes": "x"})
