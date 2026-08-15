@@ -171,6 +171,7 @@ class Database:
             "company": row.company,
             "role": row.role,
             "applied_at": row.applied_at,
+            "interview_at": row.interview_at,
             "notes": row.notes,
             "interview_questions": row.interview_questions or [],
             "position": row.position,
@@ -501,6 +502,7 @@ class Database:
         company: str | None = None,
         role: str | None = None,
         applied_at: str | None = None,
+        interview_at: str | None = None,
         notes: str | None = None,
         interview_questions: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
@@ -532,6 +534,7 @@ class Database:
                 company=company,
                 role=role,
                 applied_at=applied_at,
+                interview_at=interview_at,
                 notes=notes,
                 interview_questions=interview_questions or [],
                 position=position,
@@ -596,7 +599,14 @@ class Database:
             new_status = updates.get("status", old_status)
             target_position = updates.get("position", None)
 
-            for key in ("company", "role", "applied_at", "notes", "interview_questions"):
+            for key in (
+                "company",
+                "role",
+                "applied_at",
+                "interview_at",
+                "notes",
+                "interview_questions",
+            ):
                 if key in updates:
                     setattr(row, key, updates[key])
 

@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from '@/lib/i18n';
@@ -30,6 +31,14 @@ interface CardDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdated: () => void;
+}
+
+function toDateTimeLocalValue(value: string | null | undefined) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value.slice(0, 16);
+  const offsetMs = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
 }
 
 export function CardDetailModal({
@@ -48,6 +57,9 @@ export function CardDetailModal({
   const [questionDraft, setQuestionDraft] = useState('');
   const [savingQuestions, setSavingQuestions] = useState(false);
   const [questionsError, setQuestionsError] = useState<string | null>(null);
+  const [interviewAt, setInterviewAt] = useState('');
+  const [savingInterviewAt, setSavingInterviewAt] = useState(false);
+  const [interviewAtError, setInterviewAtError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open || !applicationId) {
@@ -61,9 +73,11 @@ export function CardDetailModal({
         if (cancelled) return;
         setDetail(data);
         setNotes(data.notes ?? '');
+        setInterviewAt(toDateTimeLocalValue(data.interview_at));
         setNotesError(null);
         setQuestionDraft('');
         setQuestionsError(null);
+        setInterviewAtError(null);
       })
       .catch(() => {
         if (!cancelled) setDetail(null);
@@ -140,6 +154,24 @@ export function CardDetailModal({
     }
   };
 
+  const handleSaveInterviewAt = async () => {
+    if (!applicationId) return;
+    setSavingInterviewAt(true);
+    setInterviewAtError(null);
+    try {
+      const updated = await updateApplication(applicationId, {
+        interview_at: interviewAt || null,
+      });
+      setDetail((current) => (current ? { ...current, ...updated } : current));
+      setInterviewAt(toDateTimeLocalValue(updated.interview_at));
+      onUpdated();
+    } catch {
+      setInterviewAtError(t('common.error'));
+    } finally {
+      setSavingInterviewAt(false);
+    }
+  };
+
   const resumeAvailable = Boolean(detail?.resume);
 
   return (
@@ -176,6 +208,35 @@ export function CardDetailModal({
                 {detail.job_content || t('tracker.modal.noJobDescription')}
               </div>
             </div>
+
+            {detail.status === 'interview' && (
+              <div className="space-y-1">
+                <Label htmlFor="card-interview-at">{t('tracker.modal.interviewTime')}</Label>
+                <Input
+                  id="card-interview-at"
+                  type="datetime-local"
+                  value={interviewAt}
+                  onChange={(e) => setInterviewAt(e.target.value)}
+                />
+                <div className="flex items-center justify-end gap-3">
+                  {interviewAtError && (
+                    <span className="font-mono text-xs text-destructive">{interviewAtError}</span>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSaveInterviewAt}
+                    disabled={savingInterviewAt}
+                  >
+                    {savingInterviewAt ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      t('tracker.modal.saveInterviewTime')
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-1">
               <Label htmlFor="card-notes">{t('tracker.modal.notes')}</Label>

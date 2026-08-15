@@ -183,6 +183,25 @@ class TestUpdateAndMove:
         assert resp.json()["status"] == "interview"
         assert resp.json()["interview_questions"] == questions
 
+    async def test_patch_interview_time_persists_to_list_and_detail(self, isolated_db):
+        card = await _seed_card(isolated_db, status="interview")
+        async with _client() as client:
+            resp = await client.patch(
+                f"/api/v1/applications/{card['application_id']}",
+                json={"interview_at": "2026-08-20T14:30"},
+            )
+        assert resp.status_code == 200
+        assert resp.json()["interview_at"] == "2026-08-20T14:30"
+
+        async with _client() as client:
+            board = (await client.get("/api/v1/applications")).json()["columns"]
+            detail = (
+                await client.get(f"/api/v1/applications/{card['application_id']}")
+            ).json()
+
+        assert board["interview"][0]["interview_at"] == "2026-08-20T14:30"
+        assert detail["interview_at"] == "2026-08-20T14:30"
+
     async def test_patch_unknown_returns_404(self, isolated_db):
         async with _client() as client:
             resp = await client.patch("/api/v1/applications/nope", json={"notes": "x"})

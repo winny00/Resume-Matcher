@@ -1007,6 +1007,7 @@
       "companyUnknown": "Empresa desconhecida",
       "roleUnknown": "Cargo sem título",
       "sharedResume": "Currículo compartilhado",
+      "interviewTime": "Entrevista {time}",
       "selectAria": "Selecionar candidatura",
       "dragAria": "Arraste para reordenar"
     },
@@ -1016,6 +1017,8 @@
       "notes": "Notas",
       "notesPlaceholder": "Adicione notas sobre esta candidatura…",
       "saveNotes": "Salvar notas",
+      "interviewTime": "Horário da entrevista",
+      "saveInterviewTime": "Salvar horário da entrevista",
       "resumeUnavailable": "O currículo enviado não está mais disponível.",
       "loadFailed": "Não foi possível carregar esta candidatura.",
       "editResume": "Editar currículo"

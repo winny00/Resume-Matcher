@@ -42,6 +42,7 @@ class ApplicationResponse(BaseModel):
     company: str | None = None
     role: str | None = None
     applied_at: str | None = None
+    interview_at: str | None = None
     notes: str | None = None
     interview_questions: list[InterviewQuestion] = Field(default_factory=list)
     position: int
@@ -91,6 +92,7 @@ class ApplicationUpdate(BaseModel):
     company: str | None = None
     role: str | None = None
     applied_at: str | None = None
+    interview_at: str | None = None
     interview_questions: list[InterviewQuestion] | None = None
 
 

@@ -4,6 +4,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import GripVertical from 'lucide-react/dist/esm/icons/grip-vertical';
+import CalendarClock from 'lucide-react/dist/esm/icons/calendar-clock';
 import Layers from 'lucide-react/dist/esm/icons/layers';
 import { Card } from '@/components/ui/card';
 import { useTranslations } from '@/lib/i18n';
@@ -37,6 +38,7 @@ export function ApplicationCard({
 
   const company = application.company?.trim();
   const role = application.role?.trim();
+  const showInterviewTime = application.status === 'interview' && application.interview_at;
 
   return (
     <div ref={setNodeRef} style={style}>
@@ -69,6 +71,14 @@ export function ApplicationCard({
             {application.applied_at && (
               <p className="mt-1 font-mono text-[10px] uppercase tracking-wide text-steel-grey">
                 {new Date(application.applied_at).toLocaleDateString()}
+              </p>
+            )}
+            {showInterviewTime && (
+              <p className="mt-1 inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-wide text-primary">
+                <CalendarClock className="h-3 w-3" />
+                {t('tracker.card.interviewTime', {
+                  time: new Date(application.interview_at!).toLocaleString(),
+                })}
               </p>
             )}
             {sharedResume && (

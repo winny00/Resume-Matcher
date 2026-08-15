@@ -95,6 +95,17 @@ describe('tracker API client', () => {
     });
   });
 
+  it('updateApplication can PATCH an interview time', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ application_id: 'x' }), { status: 200 })
+    );
+    await updateApplication('x', { interview_at: '2026-08-20T14:30' });
+    const { url, options } = lastCall();
+    expect(url).toContain('/applications/x');
+    expect(options.method).toBe('PATCH');
+    expect(JSON.parse(String(options.body))).toEqual({ interview_at: '2026-08-20T14:30' });
+  });
+
   it('createApplication POSTs the manual-add payload', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ application_id: 'x' }), { status: 200 })
