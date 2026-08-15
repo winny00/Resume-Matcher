@@ -12,6 +12,7 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import Plus from 'lucide-react/dist/esm/icons/plus';
+import SlidersHorizontal from 'lucide-react/dist/esm/icons/sliders-horizontal';
 import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
@@ -31,7 +32,9 @@ import { KanbanColumn } from './kanban-column';
 import { BulkActionBar } from './bulk-action-bar';
 import { CardDetailModal } from './card-detail-modal';
 import { ManualAddApplicationDialog } from './manual-add-application-dialog';
+import { StatusVisibilityDialog } from './status-visibility-dialog';
 import { planMove } from './reorder';
+import { persistVisibleStatuses, readVisibleStatuses } from './status-visibility';
 
 function emptyColumns(): ApplicationColumns {
   return APPLICATION_STATUS_ORDER.reduce((acc, status) => {
@@ -53,6 +56,9 @@ export function KanbanBoard() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [manualAddOpen, setManualAddOpen] = useState(false);
+  const [statusManagerOpen, setStatusManagerOpen] = useState(false);
+  const [visibleStatuses, setVisibleStatuses] =
+    useState<ApplicationStatus[]>(APPLICATION_STATUS_ORDER);
 
   // Horizontal-scroll affordance: the seven stages overflow the canvas, so we
   // track whether more columns sit off-screen and surface controls + a stage
@@ -79,10 +85,20 @@ export function KanbanBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    setVisibleStatuses(readVisibleStatuses());
+  }, []);
+
   const allCards: Application[] = useMemo(
     () => APPLICATION_STATUS_ORDER.flatMap((status) => columns[status]),
     [columns]
   );
+
+  const visibleCardIds = useMemo(() => {
+    return new Set(
+      visibleStatuses.flatMap((status) => columns[status].map((card) => card.application_id))
+    );
+  }, [columns, visibleStatuses]);
 
   // Master resume ids that back more than one card → "shared resume" badge.
   const sharedResumeIds = useMemo(() => {
@@ -96,6 +112,13 @@ export function KanbanBoard() {
   }, [allCards]);
 
   const isEmpty = allCards.length === 0;
+
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const next = new Set([...prev].filter((id) => visibleCardIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [visibleCardIds]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -113,7 +136,11 @@ export function KanbanBoard() {
       el.removeEventListener('scroll', sync);
       window.removeEventListener('resize', sync);
     };
-  }, [loading, isEmpty]);
+  }, [loading, isEmpty, visibleStatuses.length]);
+
+  const handleVisibleStatusesChange = (statuses: ApplicationStatus[]) => {
+    setVisibleStatuses(persistVisibleStatuses(statuses));
+  };
 
   const scrollByColumn = (direction: 1 | -1) => {
     scrollRef.current?.scrollBy({ left: direction * 320, behavior: 'smooth' });
@@ -218,6 +245,10 @@ export function KanbanBoard() {
               </button>
             </div>
           )}
+          <Button variant="outline" onClick={() => setStatusManagerOpen(true)}>
+            <SlidersHorizontal className="h-4 w-4" />
+            {t('tracker.manage.button')}
+          </Button>
           <Button onClick={() => setManualAddOpen(true)}>
             <Plus className="h-4 w-4" />
             {t('tracker.addApplication')}
@@ -261,12 +292,12 @@ export function KanbanBoard() {
             onDragEnd={handleDragEnd}
           >
             <div ref={scrollRef} className="flex min-h-0 flex-1 overflow-x-auto">
-              {APPLICATION_STATUS_ORDER.map((status, index) => (
+              {visibleStatuses.map((status, index) => (
                 <div
                   key={status}
                   data-column={status}
                   className={`flex ${
-                    index < APPLICATION_STATUS_ORDER.length - 1 ? 'border-r border-black' : ''
+                    index < visibleStatuses.length - 1 ? 'border-r border-black' : ''
                   }`}
                 >
                   <KanbanColumn
@@ -284,7 +315,7 @@ export function KanbanBoard() {
         )}
       </div>
 
-      {/* Stage rail — an always-visible map of every stage (with counts) so
+      {/* Stage rail — an always-visible map of enabled stages (with counts) so
           off-screen sections are never lost; click a stage to jump to it. */}
       {!isEmpty && (
         <div className="flex shrink-0 items-center gap-3 overflow-x-auto border-t border-black bg-paper-tint px-6 py-2 md:px-8">
@@ -295,7 +326,7 @@ export function KanbanBoard() {
             </span>
           )}
           <div className="flex items-center gap-2">
-            {APPLICATION_STATUS_ORDER.map((status) => (
+            {visibleStatuses.map((status) => (
               <button
                 key={status}
                 type="button"
@@ -317,6 +348,13 @@ export function KanbanBoard() {
           if (!open) setOpenCardId(null);
         }}
         onUpdated={load}
+      />
+
+      <StatusVisibilityDialog
+        open={statusManagerOpen}
+        onOpenChange={setStatusManagerOpen}
+        visibleStatuses={visibleStatuses}
+        onVisibleStatusesChange={handleVisibleStatusesChange}
       />
 
       <ManualAddApplicationDialog

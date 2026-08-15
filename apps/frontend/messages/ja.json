@@ -983,6 +983,12 @@
     "title": "応募トラッカー",
     "subtitle": "各カスタマイズ済み履歴書の選考状況を管理します。",
     "addApplication": "応募を追加",
+    "manage": {
+      "button": "管理",
+      "title": "ステージを管理",
+      "description": "応募トラッカーに表示するステータスモジュールを選択します。",
+      "lastVisible": "少なくとも 1 つのステージを表示しておく必要があります。"
+    },
     "columns": {
       "saved": "保存済み",
       "applied": "応募済み",

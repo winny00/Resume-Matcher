@@ -983,6 +983,12 @@
     "title": "Application Tracker",
     "subtitle": "Track where each tailored resume stands in your pipeline.",
     "addApplication": "Add Application",
+    "manage": {
+      "button": "Manage",
+      "title": "Manage stages",
+      "description": "Choose which status modules appear on the tracker.",
+      "lastVisible": "At least one stage must remain visible."
+    },
     "columns": {
       "saved": "Saved",
       "applied": "Applied",
